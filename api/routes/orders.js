@@ -1,23 +1,23 @@
 const express = require('express');
 //sub package in express to handle routes
 const router = express.Router()
-const Product = require('../models/product');
+const Orders = require('../models/order');
+const Products = require('../models/product');
 const mongoose = require('mongoose');
 
 router.get('/', (req, res, next) => {
-    Product.find().
-        select('name product _id').exec().then(
+    Orders.find().select('_id productId amount').exec().then(
         doc => {
-            const reponse={
-                count:doc.length,
-                products:doc.map(doc=>{
-                    return{
-                        name:doc.name,
-                        product:doc.product,
-                        _id:doc._id,
-                        request:{
-                            type:'GET',
-                            url:'http://localhost:3000/products/'+doc._id
+            const reponse = {
+                count: doc.length,
+                products: doc.map(doc => {
+                    return {
+                        OrderID: doc._id,
+                        product: doc.productId,
+                        Quantity: doc.amount,
+                        request: {
+                            type: 'GET',
+                            url: 'http://localhost:3000/orders/' + doc._id
                         }
                     }
                 })
@@ -33,23 +33,31 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
+    Products.findById(req.body.productId).then(product => {
+        if(!product){
+            return res.status(404).json({
+                message:'Product not found'
+            });
+        }
+        const newOrder = new Orders({
+            _id: new mongoose.Types.ObjectId(),
+            productId: req.body.productId,
+            amount: req.body.amount
 
-    const product1 = new Product({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        product: req.body.product
+        });
 
-    });
-    product1.save().then(result => {
+        return newOrder.save()
+    }).then(result => {
 
         res.status(200).json({
-            message: "New Product created",
-            createProduct:{
-                name:result.name,
-                product:result.product,
-                request:{
-                    type:'GET',
-                    url:'http://localhost:3000/products/'+result._id
+            message: "New order placed",
+            createOrder: {
+                ID: result._id,
+                productID: result.productId,
+                Amount: result.amount,
+                request: {
+                    type: 'GET',
+                    url: 'http://localhost:3000/orders/' + result._id
                 }
             }
         })
@@ -58,12 +66,12 @@ router.post('/', (req, res, next) => {
             message: err
         });
     });
-
 });
+
 
 router.get('/:Pid', (req, res, next) => {
     const id = req.params.Pid;
-    Product.findById(id).exec().then(
+    Orders.findById(id).exec().then(
         doc => {
             res.status(200).json(doc);
         }).catch(err => {
@@ -75,7 +83,7 @@ router.get('/:Pid', (req, res, next) => {
 });
 router.delete('/:ID', (req, res, next) => {
     const id = req.params.ID;
-    Product.remove({_id: id}).exec().then(result => {
+    Orders.remove({_id: id}).exec().then(result => {
         res.status(200).json(result);
     }).catch(err => {
         res.status(500).json({
@@ -98,14 +106,14 @@ router.put('/:ID', (req, res, next) => {
         //console.log(updateOps );
     }
     //$set is a value in mongoose, then the key:value pairs should be give to tell how to update
-    Product.update({ _id: id}, {$set: updateOps}).exec().then(result => {
+    Orders.update({_id: id}, {$set: updateOps}).exec().then(result => {
         res.status(200).json({
-            message: "Product Updated",
-            createProduct:{
-                name:result.message,
-                request:{
-                    type:'GET',
-                    url:'http://localhost:3000/products/'+id
+            message: "Order Updated",
+            createOrder: {
+                name: result.message,
+                request: {
+                    type: 'GET',
+                    url: 'http://localhost:3000/orders/' + id
                 }
             }
         });

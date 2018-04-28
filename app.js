@@ -34,6 +34,9 @@ const productRoute=require('./api/routes/products');
 //anything starting with /products will be directed to productRoute
 app.use('/products',productRoute);
 
+const orderRoute=require('./api/routes/orders');
+app.use('/orders',orderRoute);
+
 app.use((req,res,next)=>{
     const error=new Error('Not Found');
     error.status=404;

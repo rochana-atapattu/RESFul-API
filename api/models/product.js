@@ -1,9 +1,15 @@
-const mongoose=require('mongoose');
+const mongoose = require('mongoose');
 
-const prooductSchema=mongoose.Schema({
+const prooductSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    name: String,
-    product: Number
+    name: {
+        type: String,
+        required: true
+    },
+    product: {
+        type: Number,
+        required: true
+    }
 
 });
-module.exports=mongoose.model('Product',prooductSchema);
+module.exports = mongoose.model('Product', prooductSchema);
