@@ -6,25 +6,29 @@ const Products = require('../models/product');
 const mongoose = require('mongoose');
 
 router.get('/', (req, res, next) => {
-    Orders.find().select('_id productId amount').exec().then(
-        doc => {
-            const reponse = {
-                count: doc.length,
-                products: doc.map(doc => {
-                    return {
-                        OrderID: doc._id,
-                        product: doc.productId,
-                        Quantity: doc.amount,
-                        request: {
-                            type: 'GET',
-                            url: 'http://localhost:3000/orders/' + doc._id
+    Orders.find()
+        .select('_id productId amount')
+        .populate('productId')
+        .exec()
+        .then(
+            doc => {
+                const reponse = {
+                    count: doc.length,
+                    products: doc.map(doc => {
+                        return {
+                            OrderID: doc._id,
+                            product: doc.productId,
+                            Quantity: doc.amount,
+                            request: {
+                                type: 'GET',
+                                url: 'http://localhost:3000/orders/' + doc._id
+                            }
                         }
-                    }
-                })
+                    })
 
-            }
-            res.status(200).json(reponse);
-        }).catch(err => {
+                }
+                res.status(200).json(reponse);
+            }).catch(err => {
         res.status(500).json({
             message: err
         });
@@ -34,9 +38,9 @@ router.get('/', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
     Products.findById(req.body.productId).then(product => {
-        if(!product){
+        if (!product) {
             return res.status(404).json({
-                message:'Product not found'
+                message: 'Product not found'
             });
         }
         const newOrder = new Orders({
@@ -71,10 +75,13 @@ router.post('/', (req, res, next) => {
 
 router.get('/:Pid', (req, res, next) => {
     const id = req.params.Pid;
-    Orders.findById(id).exec().then(
-        doc => {
-            res.status(200).json(doc);
-        }).catch(err => {
+    Orders.findById(id)
+        .populate('productId')
+        .exec()
+        .then(
+            doc => {
+                res.status(200).json(doc);
+            }).catch(err => {
         res.status(500).json({
             message: err
         });
@@ -83,12 +90,16 @@ router.get('/:Pid', (req, res, next) => {
 });
 router.delete('/:ID', (req, res, next) => {
     const id = req.params.ID;
-    Orders.remove({_id: id}).exec().then(result => {
-        res.status(200).json(result);
-    }).catch(err => {
-        res.status(500).json({
-            message: err
-        });
+    Orders.remove({_id: id})
+        .exec()
+        .then(result => {
+            res.status(200)
+                .json(result);
+        }).catch(err => {
+        res.status(500)
+            .json({
+                message: err
+            });
     });
 })
 router.put('/:ID', (req, res, next) => {
@@ -106,18 +117,21 @@ router.put('/:ID', (req, res, next) => {
         //console.log(updateOps );
     }
     //$set is a value in mongoose, then the key:value pairs should be give to tell how to update
-    Orders.update({_id: id}, {$set: updateOps}).exec().then(result => {
-        res.status(200).json({
-            message: "Order Updated",
-            createOrder: {
-                name: result.message,
-                request: {
-                    type: 'GET',
-                    url: 'http://localhost:3000/orders/' + id
-                }
-            }
-        });
-    }).catch(err => {
+    Orders.update({_id: id}, {$set: updateOps})
+        .exec()
+        .then(result => {
+            res.status(200)
+                .json({
+                    message: "Order Updated",
+                    createOrder: {
+                        name: result.message,
+                        request: {
+                            type: 'GET',
+                            url: 'http://localhost:3000/orders/' + id
+                        }
+                    }
+                });
+        }).catch(err => {
         res.status(500).json({
             message: err
         });
