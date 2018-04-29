@@ -3,8 +3,9 @@ const express = require('express');
 const router = express.Router()
 const Product = require('../models/product');
 const mongoose = require('mongoose');
+const auth=require('../Authentication/auth');
 
-router.get('/', (req, res, next) => {
+router.get('/',auth, (req, res, next) => {
     Product.find().select('name product _id')
         .exec()
         .then(
