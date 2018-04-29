@@ -1,12 +1,12 @@
-const express=require('express');
-const app=express();
-const morgan=require('morgan');
+const express = require('express');
+const app = express();
+const morgan = require('morgan');
 //we can use this to parse the body of incoming req. Supports JSON data
-const bodyParser=require('body-parser');
-const mongoose=require('mongoose');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/test',function (err){
-    if(err){
+mongoose.connect('mongodb://127.0.0.1:27017/test', function (err) {
+    if (err) {
         console.log(err);
         process.exit(-1);
         //end the process if the connection is not successful
@@ -15,7 +15,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/test',function (err){
 });
 
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 //CORS error handling
@@ -29,25 +29,29 @@ app.use(bodyParser.json());
 });*/
 
 //import product routes
-const productRoute=require('./api/routes/products');
+const productRoute = require('./api/routes/products');
 //no matter the http verb we want any http request that has /product to be directed here.
 //anything starting with /products will be directed to productRoute
-app.use('/products',productRoute);
+app.use('/products', productRoute);
 
-const orderRoute=require('./api/routes/orders');
-app.use('/orders',orderRoute);
+const orderRoute = require('./api/routes/orders');
+app.use('/orders', orderRoute);
 
-app.use((req,res,next)=>{
-    const error=new Error('Not Found');
-    error.status=404;
+const userRoute = require('./api/routes/user');
+app.use('/user', userRoute);
+
+
+app.use((req, res, next) => {
+    const error = new Error('Not Found');
+    error.status = 404;
     next(error);
 });
 
-app.use((error,req,res,next)=>{
+app.use((error, req, res, next) => {
     res.status(error.status || 500);
     res.json({
-        error:{
-            message:error.message
+        error: {
+            message: error.message
         }
     })
 });
