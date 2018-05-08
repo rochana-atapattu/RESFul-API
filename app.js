@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://user:admin@cluster0-shard-00-00-stpg9.mongodb.net:27017,cluster0-shard-00-01-stpg9.mongodb.net:27017,cluster0-shard-00-02-stpg9.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin', function (err) {
+mongoose.connect('mongodb://user:'+ process.env.MONGO_PASS +'@cluster0-shard-00-00-stpg9.mongodb.net:27017,cluster0-shard-00-01-stpg9.mongodb.net:27017,cluster0-shard-00-02-stpg9.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin', function (err) {
     if (err) {
         console.log(err);
         process.exit(-1);
