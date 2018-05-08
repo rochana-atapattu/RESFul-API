@@ -1,7 +1,8 @@
 #!/bin/sh
 
- cd /home/ubuntu/rest
+ cd /home/ubuntu/rest/RESFul-API
  git pull
-
+ npm install --production
+ pm2 restart all
  exit      
 
