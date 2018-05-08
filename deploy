@@ -1,4 +1,4 @@
--#!/bin/sh
+#!/bin/sh
 <<EOF       
  cd /home/ubuntu/rest 
  git pull      
