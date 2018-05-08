@@ -5,8 +5,8 @@ const productController = require('../controllers/user');
 
 
 
-router.post('/signup',productController.signup() );
-router.post('/login', productController.login());
+router.post('/signup',productController.signup );
+router.post('/login', productController.login);
 
 
 //router with routes is exported
